@@ -246,7 +246,7 @@ bool next_combination(index_t* c, index_t n, index_t k)
 
 	std::int64_t j;
 
-	for (j = k - 2; j >= 0; j--)
+	for (j = k - 2; j >= 0; --j)
 	{
 		if (c[j] < n - k + j)
 		{
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 	const index_t n = read_graph_size(file);
 	graph g = read_dimacs(file);
 
-	// auto start = std::chrono::steady_clock::now();
+	//auto start = std::chrono::steady_clock::now();
 
 	index_t* adj = 0;
 	index_t* pos = 0;
@@ -334,10 +334,10 @@ int main(int argc, char *argv[])
 
 	auto coeffs = local_clustering(n, adj, pos);
 
-	// auto finish = std::chrono::steady_clock::now();
-	// double elapsed_seconds = std::chrono::duration_cast<
+	//auto finish = std::chrono::steady_clock::now();
+	//double elapsed_seconds = std::chrono::duration_cast<
 	// 	std::chrono::duration<double> >(finish - start).count();
-	// std::cout << elapsed_seconds << " s\n\n";
+	//std::cout << elapsed_seconds << " s\n\n";
 
 	std::sort(coeffs.begin(), coeffs.end());
 
