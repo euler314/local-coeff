@@ -20,7 +20,7 @@ typedef std::uint64_t index_t;
 #include <unordered_set>
 #include <boost/functional/hash.hpp>
 
-typedef std::unordered_set<std::pair<index_t, index_t>, 
+typedef std::unordered_set<std::pair<index_t, index_t>,
 	boost::hash< std::pair<index_t, index_t> >  > edge_set;
 
 static index_t *enlarge(index_t m, index_t m_was, index_t *was)
@@ -103,24 +103,20 @@ index_t read_graph_size(const std::string& filename)
 
 	while (std::getline(file, line))
 	{
-		std::istringstream iss(line);
-		char ch;
-
-		if (iss >> ch)
+		if (line[0] == 'p')
 		{
-			if (ch == 'p')
+			std::istringstream iss(line.erase(0, 1));
+			std::string format = "";
+			if (iss >> format >> n >> m)
 			{
-				std::string format = "";
-				if (iss >> format >> n >> m)
-				{
-					// Format can be whatever (like "edge").
-				}
-				else
-				{
-					const std::string error = "Badly formatted problem line in " + filename;
-					std::cerr << error << "\n";
-					assert(false && "Badly formatted problem line");
-				}
+				// Format can be whatever (like "edge").
+				break;
+			}
+			else
+			{
+				const std::string error = "Badly formatted problem line in " + filename;
+				std::cerr << error << "\n";
+				assert(false && "Badly formatted problem line");
 			}
 		}
 	}
@@ -140,29 +136,24 @@ graph read_dimacs(const std::string& filename)
 
 	while (std::getline(file, line))
 	{
-		std::istringstream iss(line);
-		char ch;
-
-		if (iss >> ch)
+		if (line[0] == 'e')
 		{
-			if (ch == 'e')
+			std::istringstream iss(line.erase(0, 1));
+			index_t u = 0;
+			index_t v = 0;
+			if (iss >> u >> v)
 			{
-				index_t u = 0;
-				index_t v = 0;
-				if (iss >> u >> v)
-				{
-					// In DIMACS, vertices start from 1 (not from 0)
-					graph_add_edge(g, u - 1, v - 1);
+				// In DIMACS, vertices start from 1 (not from 0)
+				graph_add_edge(g, u - 1, v - 1);
 
-					// Additional data structure for fast adjacency lookup
-					edges.insert(std::make_pair(u - 1, v - 1));
-				}
-				else
-				{
-					const std::string error = "Badly formatted edge line in " + filename;
-					std::cerr << error << "\n";
-					assert(false && "Badly formatted edge line");
-				}
+				// Additional data structure for fast adjacency lookup
+				edges.insert(std::make_pair(u - 1, v - 1));
+			}
+			else
+			{
+				const std::string error = "Badly formatted edge line in " + filename;
+				std::cerr << error << "\n";
+				assert(false && "Badly formatted edge line");
 			}
 		}
 	}
@@ -281,15 +272,14 @@ double local_clustering_coefficient(index_t v, index_t* adj, index_t* pos)
 		return 0.0;
 	}
 
-	index_t* vset = new index_t[k];
-	std::iota(vset, vset + k, 0);
+	index_t vset[2] = { 0, 1 };
 
 	index_t tr_count = 0;
 	index_t total = 0;
 
 	do
 	{
-		// v[0], v[1] is the index pair to check
+		// v[0], v[1] is the index pair to check
 		if (edges.find(std::make_pair(neigh[vset[0]], neigh[vset[1]])) != edges.end())
 		{
 			++tr_count;
@@ -297,8 +287,6 @@ double local_clustering_coefficient(index_t v, index_t* adj, index_t* pos)
 
 		++total;
 	} while (next_combination(vset, n, k));
-
-	delete[] vset;
 
 	return tr_count / static_cast<double>(total);
 }
