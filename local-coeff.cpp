@@ -265,14 +265,14 @@ double local_clustering_coefficient(index_t v, index_t* adj, index_t* pos)
 {
 	const auto neigh = get_adjacency_list(v, adj, pos);
 	const index_t n = neigh.size();
-	const index_t k = 2;
-
+	
 	if (n < 2)
 	{
 		return 0.0;
 	}
-
-	index_t vset[2] = { 0, 1 };
+	
+	const index_t k = 2;
+	index_t vset[k] = { 0, 1 };
 
 	index_t tr_count = 0;
 	index_t total = 0;
